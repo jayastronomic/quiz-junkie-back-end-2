@@ -7,15 +7,20 @@ module Api
             def create
                 user = User.new(user_params)
                 if user.save 
-                    render json: user
+                    score = Score.create(points: 0)
+                    user.score = score
+                    render json: user.to_json(include: [:score])
                 else
-                    render json:{Status: "ERROR", message: user.errors.full_messages}
+                    error = user.errors.full_messages.join()
+                        
+                    render json: { status: "ERROR", message: error}
                 end
             end
 
             def index
                 users = User.all 
-                render json: users
+                scores = Score.all
+                render json: { data: { users: users, user_scores: scores } }
             end
 
             private
